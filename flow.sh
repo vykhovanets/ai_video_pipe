@@ -33,11 +33,12 @@ function flow {
         echo "esrgan executable not found"
     fi
 
+    # ./realesrgan-ncnn-vulkan \
     $esrgan \
         -i "$filtered" \
         -o "$upscaled" \
         -n realesrgan-x4plus \
-        -s 1 \
+        -s 4 \
         -f jpg
     # cp "$filtered"/* "$upscaled"/
 
