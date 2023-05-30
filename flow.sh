@@ -1,6 +1,6 @@
 #!/bin/bash
 
-fps=30
+fps=29
 
 function flow {
     video_path=$1
@@ -25,7 +25,15 @@ function flow {
     ./rename.sh "$filtered"
 
     echo "///////////////////////// upscale frames"
-    ./realesrgan-ncnn-vulkan \
+
+    # make it usable on windows, but ffmpeg should be in the path
+    esrgan=$(find . -maxdepth 1 -name "realesrgan-ncnn-vulkan*" -type f -perm +111 | head -n 1)
+
+    if [[ -z $exec_command ]]; then
+        echo "esrgan executable not found"
+    fi
+
+    $esrgan \
         -i "$filtered" \
         -o "$upscaled" \
         -n realesrgan-x4plus \
@@ -33,6 +41,7 @@ function flow {
         -f jpg
     # cp "$filtered"/* "$upscaled"/
 
+    # TODO: SC2012 (info): Use find instead of ls to better handle non-alphanumeric filenames.
     num_input=$(ls -1 "$input" | wc -l | awk '{$1=$1};1')
     num_filtered=$(ls -1 "$filtered" | wc -l | awk '{$1=$1};1')
     new_fps=$(echo "scale=2; $num_filtered * $fps / $num_input" | bc)
